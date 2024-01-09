@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_flutter_proj/screens/complete_profile/complete_profile_screen.dart';
+import 'package:uni_flutter_proj/toasts.dart';
+import 'package:uni_flutter_proj/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -37,6 +41,46 @@ class _SignFormState extends State<SignForm> {
     }
   }
 
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  bool isSigningUp = false;
+
+  void _signIn(context) async {
+
+    setState(() {
+      isSigningUp = true;
+    });
+
+    String email = _emailController.text.toString();
+    String password = _passwordController.text.toString();
+
+    if(email.isEmpty  || password.isEmpty){
+      showToast(message: "Enter Required fields");
+      return;
+    }else{
+      UserCredential? usercredential;
+      try{
+        KeyboardUtil.hideKeyboard(context);
+        usercredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => LoginSuccessScreen()),));
+        print("SUCCESSS::::>");
+      } on FirebaseException catch(err){
+        print("ERROR::>");
+        print(err.code.toString());
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -44,6 +88,7 @@ class _SignFormState extends State<SignForm> {
       child: Column(
         children: [
           TextFormField(
+            controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             onSaved: (newValue) => email = newValue,
             onChanged: (value) {
@@ -75,6 +120,7 @@ class _SignFormState extends State<SignForm> {
           ),
           const SizedBox(height: 20),
           TextFormField(
+            controller: _passwordController,
             obscureText: true,
             onSaved: (newValue) => password = newValue,
             onChanged: (value) {
@@ -134,9 +180,9 @@ class _SignFormState extends State<SignForm> {
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
+                _signIn(context);
                 // if all are valid then go to success screen
-                KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+
               }
             },
             child: const Text("Continue"),

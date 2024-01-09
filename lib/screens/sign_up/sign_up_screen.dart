@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:uni_flutter_proj/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 import '../../components/socal_card.dart';
 import '../../constants.dart';
 import 'components/sign_up_form.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   static String routeName = "/sign_up";
 
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
